@@ -1,7 +1,3 @@
-Thought for a few seconds
-
-
-````markdown
 # Librix
 
 Librix is a Next.js–powered media explorer web application that lets you index and browse files (PDF, MP4, images, etc.) stored on one or more remote HTTP/WebDAV–style servers. You run a small VPS frontend that proxies and catalogs content in SQLite, while storage back-ends live on low-cost shared hosting or any HTTP server.
@@ -26,7 +22,7 @@ Librix is a Next.js–powered media explorer web application that lets you index
 ## Getting Started
 
 1. **Clone the repo**  
-   ```bash
+```bash
    git clone https://github.com/your-org/librix.git
    cd librix
 ````
@@ -148,5 +144,3 @@ librix/
 ---
 
 Happy exploring with **Librix**! 🚀
-
-```
