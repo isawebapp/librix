@@ -1,4 +1,3 @@
-// src/app/search/page.tsx
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -25,14 +24,12 @@ export default function SearchPage() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [backends, setBackends] = useState<Backend[]>([]);
 
-  // load backend names once
   useEffect(() => {
     fetch('/api/backends')
       .then((r) => r.json())
       .then(setBackends);
   }, []);
 
-  // whenever the URL ?q= changes (including on Back), refetch
   useEffect(() => {
     setQ(qParam);
     if (!qParam) {
@@ -44,7 +41,6 @@ export default function SearchPage() {
       .then(setResults);
   }, [qParam]);
 
-  // on form submit, push new URL entry
   function onSearch(e: React.FormEvent) {
     e.preventDefault();
     const query = q.trim();

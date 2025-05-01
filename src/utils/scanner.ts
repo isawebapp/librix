@@ -1,4 +1,3 @@
-// src/utils/scanner.ts
 import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
 import db from './db';
@@ -26,7 +25,6 @@ export async function scanBackendById(id: number) {
     : undefined;
 
   async function recurse(dirPath: string) {
-    // ensure trailing slash
     if (!dirPath.endsWith('/')) dirPath += '/';
 
     const listUrl = backend.url.replace(/\/$/, '') + dirPath;
@@ -41,7 +39,6 @@ export async function scanBackendById(id: number) {
       const href = $(el).attr('href');
       if (!href) return;
 
-      // skip Parent Directory and Apache sort/query links
       if (href.startsWith('..') || href.startsWith('?')) {
         return;
       }
@@ -49,15 +46,12 @@ export async function scanBackendById(id: number) {
       const isDir = href.endsWith('/');
       const name = href.replace(/\/$/, '');
 
-      // resolve href against the listing URL
       const urlObj = new URL(href, listUrl);
 
-      // build a clean absolute path, collapsing duplicate slashes
       let filePath = pathPosix.normalize(urlObj.pathname);
       if (!filePath.startsWith('/')) filePath = '/' + filePath;
       if (isDir && !filePath.endsWith('/')) filePath += '/';
 
-      // upsert into SQLite
       db.prepare(`
         INSERT INTO files 
           (backendId, path, name, url, isDirectory, scannedAt)
@@ -74,7 +68,6 @@ export async function scanBackendById(id: number) {
       );
     });
 
-    // now recurse into sub‐dirs
     const dirs: string[] = db
       .prepare(`
         SELECT path FROM files 
@@ -82,7 +75,6 @@ export async function scanBackendById(id: number) {
       `)
       .all(backend.id, pathPosix.normalize(dirPath) + '%')
       .map((row: any) => row.path)
-      // only direct children:
       .filter(p => {
         const rest = p.slice(dirPath.length).replace(/\/$/, '');
         return rest && !rest.includes('/');
@@ -93,9 +85,7 @@ export async function scanBackendById(id: number) {
     }
   }
 
-  // start at root
   await recurse('/');
-  // mark last‐scanned
   db.prepare('UPDATE backends SET scannedAt = ? WHERE id = ?').run(
     new Date().toISOString(),
     id

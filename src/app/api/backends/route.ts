@@ -1,10 +1,8 @@
-// src/app/api/backends/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import db from '@/utils/db';
 import { authOptions } from '../auth/[...nextauth]/route';
 
-// Helper: require an admin session for mutating routes
 async function requireAdmin(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== 'admin') {
@@ -13,7 +11,6 @@ async function requireAdmin(req: NextRequest) {
   return null;
 }
 
-// Utility: pick the smallest unused positive integer ID
 function getNextId() {
   const rows: { id: number }[] = db.prepare('SELECT id FROM backends ORDER BY id').all();
   let next = 1;
@@ -25,7 +22,6 @@ function getNextId() {
 }
 
 export async function GET(_req: NextRequest) {
-  // Allow guests to fetch the list of backends (id, name, rescanInterval)
   const list = db
     .prepare('SELECT id, name, rescanInterval FROM backends ORDER BY id')
     .all();
@@ -89,10 +85,8 @@ export async function DELETE(req: NextRequest) {
   const { id } = await req.json();
   const delId  = Number(id);
 
-  // delete the backend
   db.prepare('DELETE FROM backends WHERE id = ?').run(delId);
 
-  // shift down all higher IDs
   const higher = db
     .prepare('SELECT id FROM backends WHERE id > ? ORDER BY id ASC')
     .all(delId);

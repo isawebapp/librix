@@ -20,7 +20,6 @@ export default function ViewerPage() {
     if (['mp4','webm','ogg'].includes(ext || '')) {
       return <video src={src} controls style={{ maxWidth: '100%' }} />;
     }
-    // Fallback: download link
     return (
       <a href={src} target="_blank" rel="noopener noreferrer">
         Download {path.split('/').pop()}

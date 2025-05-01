@@ -1,11 +1,9 @@
-// src/utils/db.ts
 import Database from 'better-sqlite3';
 import path from 'path';
 
 const db = new Database(path.resolve(process.cwd(), 'data.db'));
 db.pragma('journal_mode = WAL');
 
-// backends table now has `name`
 db.prepare(`
   CREATE TABLE IF NOT EXISTS backends (
     id             INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -19,7 +17,6 @@ db.prepare(`
   );
 `).run();
 
-// files table unchanged
 db.prepare(`
   CREATE TABLE IF NOT EXISTS files (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
