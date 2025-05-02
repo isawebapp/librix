@@ -11,6 +11,7 @@
 !.yarn/versions
 
 data.db
+data.*
 
 # testing
 /coverage
