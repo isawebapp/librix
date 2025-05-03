@@ -5,7 +5,8 @@ export function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get('q') || '';
   const rows = db
     .prepare(
-      `SELECT * FROM files
+      `SELECT id, backendId, path, name, size, modifiedAt, scannedAt
+       FROM files
        WHERE name LIKE ? AND isDirectory = 0
        ORDER BY name
        LIMIT 200`
