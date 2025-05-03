@@ -12,19 +12,19 @@ export async function GET(request: NextRequest) {
   const parent = dirPath.endsWith('/') ? dirPath : dirPath + '/';
 
   // Fetch all entries under this backend whose path starts with parent
-  const allRows: { id: number; path: string; isDirectory: number }[] =
-    db.prepare(`
+  const allRows = db
+    .prepare(`
       SELECT id, path, isDirectory
       FROM files
       WHERE backendId = ?
         AND path LIKE ?
       ORDER BY isDirectory DESC, name
-    `).all(backendId, parent + '%');
+    `)
+    .all(backendId, parent + '%') as { id: number; path: string; isDirectory: number }[];
 
   // Filter down to direct children only
   const direct = allRows.filter((row) => {
     const remainder = row.path.slice(parent.length).replace(/^\/+/, '');
-    // must be non-empty and not contain further '/' beyond the trailing slash for dirs
     if (!remainder) return false;
     const parts = remainder.split('/');
     return parts.length === 1 || (parts.length === 2 && parts[1] === '');
@@ -33,7 +33,6 @@ export async function GET(request: NextRequest) {
   // Map to API shape, computing `name` from the path
   const entries = direct.map((row) => {
     const isDir = row.isDirectory === 1;
-    // strip the parent prefix and any trailing slash
     let name = row.path.slice(parent.length);
     if (isDir && name.endsWith('/')) name = name.slice(0, -1);
     return {

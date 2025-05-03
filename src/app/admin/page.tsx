@@ -1,19 +1,23 @@
-// app/settings/page.tsx
+// src/app/admin/page.tsx
 import { getServerSession } from 'next-auth/next';
 import { redirect } from 'next/navigation';
-import { authOptions } from '../api/auth/[...nextauth]/route';
-import SettingsClient from './admin-client';
+import { authOptions } from '@/lib/auth';
+import AdminClient from './admin-client';
 
-export default async function SettingsPage() {
+export default async function AdminPage() {
   const session = await getServerSession(authOptions);
+
+  // not signed in → send to login, then back here
   if (!session) {
-    // not signed in → send to login, then back here
     redirect('/api/auth/signin?callbackUrl=/admin');
   }
-  if (session.user.role !== 'admin') {
-    // signed in but not admin → home
+
+  // signed in but not admin → home
+  const user = session.user as { role?: string };
+  if (user.role !== 'admin') {
     redirect('/');
   }
+
   // admin → render the client UI
-  return <SettingsClient />;
+  return <AdminClient />;
 }
