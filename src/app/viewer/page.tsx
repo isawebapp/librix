@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
+import styles from './page.module.css'
 
 type ViewerPageProps = {
   // Next.js 15 passes searchParams in props as a Promise
@@ -24,16 +24,16 @@ export default async function ViewerPage({
     typeof rawBackend === 'string'
       ? rawBackend
       : Array.isArray(rawBackend)
-      ? rawBackend[0]
-      : ''
+        ? rawBackend[0]
+        : ''
 
   const rawPath = params.path
   const path =
     typeof rawPath === 'string'
       ? rawPath
       : Array.isArray(rawPath)
-      ? rawPath[0]
-      : ''
+        ? rawPath[0]
+        : ''
 
   // 3) Build the API URL (will be fetched by the browser when the page loads)
   const src = `/api/files/view?backendId=${encodeURIComponent(
@@ -48,7 +48,11 @@ export default async function ViewerPage({
     viewerElement = (
       <iframe
         src={src}
-        style={{ width: '100%', height: '100vh', border: 'none' }}
+        style={{
+          width: '100%',
+          height: '100%',
+          border: 'none',
+        }}
       />
     )
   } else if (
@@ -61,16 +65,25 @@ export default async function ViewerPage({
         alt={path}
         width={800}
         height={600}
-        style={{ maxWidth: '100%', height: 'auto' }}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+        }}
         unoptimized
       />
+
     )
   } else if (ext && ['mp4', 'webm', 'ogg'].includes(ext)) {
     viewerElement = (
       <video
         src={src}
         controls
-        style={{ maxWidth: '100%', height: 'auto' }}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+        }}
       />
     )
   } else {
@@ -82,11 +95,7 @@ export default async function ViewerPage({
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      {/* Optional: link back to search or home */}
-      <p>
-        <Link href="/search">← Back to search</Link>
-      </p>
+    <div className={styles.container}>
       {viewerElement}
     </div>
   )

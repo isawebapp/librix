@@ -1,0 +1,11 @@
+/* app/viewer/page.module.css */
+.container {
+  position: fixed;
+  top: 64px;    /* push it below the nav */
+  inset-inline: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}

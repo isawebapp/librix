@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import AdminClient from './admin-client';
+import styles from './page.module.css'
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
@@ -19,5 +20,5 @@ export default async function AdminPage() {
   }
 
   // admin → render the client UI
-  return <AdminClient />;
+  return <div className={styles.container}><AdminClient /></div>;
 }
