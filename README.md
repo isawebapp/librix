@@ -23,7 +23,7 @@ Librix is a Next.js–powered media explorer web application that lets you index
 
 1. **Clone the repo**  
 ```bash
-   git clone https://github.com/your-org/librix.git
+   git clone https://github.com/isawebapp/librix.git
    cd librix
 ````
 
