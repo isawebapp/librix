@@ -23,3 +23,38 @@ declare module '*.svg' {
   const src: string;
   export default src;
 }
+
+// global.d.ts
+declare module 'node-cron' {
+  import { EventEmitter } from 'events';
+
+  /** Create a scheduled task */
+  export function schedule(
+    cronExpression: string,
+    func: ((now: Date | 'manual' | 'init') => void) | string,
+    options?: ScheduleOptions,
+  ): ScheduledTask;
+
+  /** Validate a cron expression */
+  export function validate(cronExpression: string): boolean;
+
+  /** Get all registered tasks */
+  export function getTasks(): Map<string, ScheduledTask>;
+
+  export interface ScheduledTask extends EventEmitter {
+    /** Manually trigger the task */
+    now: (now?: Date) => void;
+    start(): void;
+    stop(): void;
+  }
+
+  export interface ScheduleOptions {
+    scheduled?: boolean;
+    timezone?: string;
+    recoverMissedExecutions?: boolean;
+    name?: string;
+    runOnInit?: boolean;
+  }
+}
+
+declare module 'better-sqlite3';
