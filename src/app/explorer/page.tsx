@@ -5,8 +5,6 @@ export const dynamic = 'force-dynamic';
 
 export default function ExplorerPage() {
   return (
-    <div className={styles.container}>
-      <ExplorerClient />;
-    </div>
+    <ExplorerClient />
   )
 }
