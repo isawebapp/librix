@@ -31,13 +31,9 @@ export default async function SearchPage({
 
   // 3) await headers() before using .get()
   const hdrs = await headers()
-  // prefer X-Forwarded-Host if you're behind a proxy; fallback to Host
-  const host =
-    hdrs.get('x-forwarded-host') ??
-    hdrs.get('host') ??
-    'localhost:3000'
-  const protocol = host.includes('localhost') ? 'http' : 'https'
-  const origin = `${protocol}://${host}`
+  const host = hdrs.get('x-forwarded-host') ?? hdrs.get('host')!
+  const proto = hdrs.get('x-forwarded-proto') ?? (host.includes('localhost') ? 'http' : 'https')
+  const origin = `${proto}://${host}`
 
   // 4) fetch with absolute URLs
   const [backends, results] = await Promise.all([
