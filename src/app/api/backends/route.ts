@@ -111,7 +111,9 @@ export async function PUT(req: NextRequest) {
     WHERE id = ?
   `;
 
-  db.prepare(updateQuery).run(...values, id);
+  const updateValues = [...values, id];
+
+  db.prepare(updateQuery).run(...updateValues);
 
   const updated = db
     .prepare('SELECT * FROM backends WHERE id = ?')
@@ -119,6 +121,7 @@ export async function PUT(req: NextRequest) {
 
   return NextResponse.json(updated);
 }
+
 
 
 export async function DELETE(req: NextRequest) {
