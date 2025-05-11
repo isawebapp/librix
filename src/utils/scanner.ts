@@ -14,9 +14,7 @@ export interface BackendRecord {
   scannedAt?: string;
 }
 
-// scans a single backend by ID
 export async function scanBackendById(id: number) {
-  // fetch the row, then narrow to BackendRecord
   const row = db
     .prepare('SELECT * FROM backends WHERE id = ?')
     .get(id) as BackendRecord | undefined;
@@ -28,9 +26,10 @@ export async function scanBackendById(id: number) {
       ? 'Basic ' + Buffer.from(`${backend.username}:${backend.password}`).toString('base64')
       : undefined;
 
+  db.prepare('DELETE FROM files WHERE backendId = ?').run(backend.id);
+
   async function recurse(dirPath: string) {
     if (!dirPath.endsWith('/')) dirPath += '/';
-    // now `backend` is definitely defined
     const listUrl = backend.url.replace(/\/$/, '') + dirPath;
     const res = await fetch(
       listUrl,
@@ -92,7 +91,6 @@ export async function scanBackendById(id: number) {
   );
 }
 
-// scans all backends unconditionally
 export async function scanAllDue(): Promise<void> {
   const rows = db
     .prepare('SELECT id FROM backends ORDER BY id')

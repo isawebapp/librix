@@ -10,7 +10,6 @@ export const authOptions: NextAuthOptions = {
         username: { label: 'Username', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      // Note the single-argument signature now that req isn't used
       async authorize(credentials) {
         if (
           credentials?.username === process.env.ADMIN_USER &&

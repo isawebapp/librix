@@ -5,7 +5,6 @@ import Image from 'next/image'
 import styles from './page.module.css'
 
 type ViewerPageProps = {
-  // Next.js 15 passes searchParams in props as a Promise
   searchParams: Promise<{
     backendId?: string | string[]
     path?: string | string[]
@@ -15,10 +14,8 @@ type ViewerPageProps = {
 export default async function ViewerPage({
   searchParams,
 }: ViewerPageProps) {
-  // 1) Wait for Next.js to give us the actual params object
   const params = await searchParams
 
-  // 2) Normalize backendId and path to single strings
   const rawBackend = params.backendId
   const backendId =
     typeof rawBackend === 'string'
@@ -35,12 +32,10 @@ export default async function ViewerPage({
         ? rawPath[0]
         : ''
 
-  // 3) Build the API URL (will be fetched by the browser when the page loads)
   const src = `/api/files/view?backendId=${encodeURIComponent(
     backendId
   )}&path=${encodeURIComponent(path)}`
 
-  // 4) Choose the viewer based on file extension
   const ext = path.split('.').pop()?.toLowerCase()
 
   let viewerElement: React.ReactNode

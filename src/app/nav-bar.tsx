@@ -44,13 +44,13 @@ export default function NavBar() {
         </button>
       )}
       {isViewer && fileName ? (
-        <h1 style={{ margin: 0 }}>{fileName}</h1>
+        <h1 style={{ margin: 0 }}>{decodeURIComponent(fileName)}</h1>
       ) : (
-        <>
-          <Link href="/search">Search</Link> |{' '}
-          <Link href="/explorer">Explorer</Link> |{' '}
-          <Link href="/admin">Admin</Link>
-        </>
+      <>
+        <Link href="/search">Search</Link> |{' '}
+        <Link href="/explorer">Explorer</Link> |{' '}
+        <Link href="/admin">Admin</Link>
+      </>
       )}
     </nav>
   );

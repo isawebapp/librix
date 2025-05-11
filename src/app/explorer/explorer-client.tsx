@@ -1,4 +1,3 @@
-// src/app/explorer/explorer-client.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -32,13 +31,15 @@ export default function ExplorerClient() {
 
   useEffect(() => {
     if (backendId != null) {
-      fetch(
-        `/api/files/explorer?backendId=${backendId}&path=${encodeURIComponent(
-          pathParam
-        )}`
-      )
-        .then(r => r.json())
-        .then(setEntries);
+      setEntries([]);
+
+      fetch(`/api/files/explorer?backendId=${backendId}&path=${encodeURIComponent(pathParam)}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data && Array.isArray(data)) {
+            setEntries(data);
+          }
+        });
     }
   }, [backendId, pathParam]);
 
@@ -98,14 +99,13 @@ export default function ExplorerClient() {
             </div>
 
             <div className={styles.upBar}>
-              <button onClick={goUp} disabled={pathParam === '/'}>
-                ↑ Up
-              </button>
-              <span className={styles.cwd}>{pathParam}</span>
+              <button onClick={goUp} disabled={pathParam === '/'}> ↑ Up </button>
+              <span className={styles.cwd}>{decodeURIComponent(pathParam)}</span>
             </div>
 
+
             <ul className={styles.entries}>
-              {entries.map(e => (
+              {entries.map((e) => (
                 <li key={e.id}>
                   {e.isDirectory ? '📁' : '📄'}{' '}
                   {e.isDirectory ? (
@@ -115,20 +115,19 @@ export default function ExplorerClient() {
                         updateUrl(backendId, dir);
                       }}
                     >
-                      {e.name}
+                      {decodeURIComponent(e.name)}
                     </button>
                   ) : (
                     <Link
-                      href={`/viewer?backendId=${backendId}&path=${encodeURIComponent(
-                        e.path
-                      )}`}
+                      href={`/viewer?backendId=${backendId}&path=${encodeURIComponent(e.path)}`}
                     >
-                      {e.name}
+                      {decodeURIComponent(e.name)}
                     </Link>
                   )}
                 </li>
               ))}
             </ul>
+
           </>
         ) : (
           <p>Please select a backend from above.</p>

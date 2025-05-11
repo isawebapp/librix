@@ -8,7 +8,7 @@ interface BackendRecord {
   id: number;
   name: string;
   url: string;
-  authEnabled: number;       // 1 = true, 0 = false
+  authEnabled: number;
   username: string | null;
   password: string | null;
   rescanInterval: number | null;
@@ -21,7 +21,6 @@ interface FileRecord {
 export async function GET(request: NextRequest) {
   const url = request.nextUrl;
 
-  // 1. Validate and parse backendId
   const backendIdParam = url.searchParams.get('backendId');
   if (!backendIdParam) {
     return new NextResponse('Missing backendId', { status: 400 });
@@ -31,7 +30,6 @@ export async function GET(request: NextRequest) {
     return new NextResponse('Invalid backendId', { status: 400 });
   }
 
-  // 2. Validate and normalize file path
   const filePathParam = url.searchParams.get('path');
   if (!filePathParam) {
     return new NextResponse('Missing file path', { status: 400 });
@@ -41,7 +39,6 @@ export async function GET(request: NextRequest) {
     filePath = '/' + filePath;
   }
 
-  // 3. Lookup backend (parameterized)
   const backendStmt = db.prepare(`
     SELECT id, name, url, authEnabled, username, password, rescanInterval
       FROM backends
@@ -52,7 +49,6 @@ export async function GET(request: NextRequest) {
     return new NextResponse('Unknown backend', { status: 404 });
   }
 
-  // 4. Lookup file URL (parameterized)
   const fileStmt = db.prepare(`
     SELECT url
       FROM files
@@ -64,7 +60,6 @@ export async function GET(request: NextRequest) {
     return new NextResponse('File not found', { status: 404 });
   }
 
-  // 5. Prepare headers to forward (Range + Basic auth)
   const forwardHeaders: Record<string, string> = {};
   const range = request.headers.get('range');
   if (range) forwardHeaders['range'] = range;
@@ -76,7 +71,6 @@ export async function GET(request: NextRequest) {
     forwardHeaders['authorization'] = `Basic ${creds}`;
   }
 
-  // 6. Fetch from origin (supports partial content)
   const upstream = await fetch(file.url, { headers: forwardHeaders });
   if (!upstream.ok && upstream.status !== 206) {
     return new NextResponse(`Upstream error: ${upstream.status}`, {
@@ -84,7 +78,6 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  // 7. Copy relevant response headers
   const responseHeaders = new Headers();
   for (const header of [
     'content-type',
@@ -100,14 +93,12 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // 8. Force inline display with sanitized filename
   const filename = encodeURIComponent(filePath.split('/').pop() || 'file');
   responseHeaders.set(
     'content-disposition',
     `inline; filename="${filename}"`
   );
 
-  // 9. Stream the body back to the client
   return new NextResponse(upstream.body, {
     status: upstream.status,
     headers: responseHeaders,

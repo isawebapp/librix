@@ -22,28 +22,22 @@ export default async function SearchPage({
 }: {
   searchParams: Promise<{ q?: string | string[] }>
 }) {
-  // 1) await the incoming Promise for searchParams
   const params = await searchParams
-
-  // 2) normalize q to a single string
   const rawQ = params.q
   const q = Array.isArray(rawQ) ? rawQ[0] : rawQ ?? ''
-
-  // 3) await headers() before using .get()
   const hdrs = await headers()
   const host = hdrs.get('x-forwarded-host') ?? hdrs.get('host')!
   const proto = hdrs.get('x-forwarded-proto') ?? (host.includes('localhost') ? 'http' : 'https')
   const origin = `${proto}://${host}`
 
-  // 4) fetch with absolute URLs
   const [backends, results] = await Promise.all([
     fetch(`${origin}/api/backends`, { cache: 'no-store' })
       .then((r) => r.json()) as Promise<Backend[]>,
     q
       ? fetch(
-          `${origin}/api/files/search?q=${encodeURIComponent(q)}`,
-          { cache: 'no-store' }
-        ).then((r) => r.json()) as Promise<SearchResult[]>
+        `${origin}/api/files/search?q=${encodeURIComponent(q)}`,
+        { cache: 'no-store' }
+      ).then((r) => r.json()) as Promise<SearchResult[]>
       : Promise.resolve([]),
   ])
 
@@ -71,22 +65,19 @@ export default async function SearchPage({
           return (
             <li key={r.id}>
               {r.isDirectory ? '📁' : '📄'}{' '}
-              <span
-                style={{ fontStyle: 'italic', marginRight: '0.5ch' }}
-              >
+              <span style={{ fontStyle: 'italic', marginRight: '0.5ch' }}>
                 [{label}]
               </span>
               <Link
-                href={`/viewer?backendId=${r.backendId}&path=${encodeURIComponent(
-                  r.path
-                )}`}
+                href={`/viewer?backendId=${r.backendId}&path=${encodeURIComponent(r.path)}`}
               >
-                {r.path}
+                {decodeURIComponent(r.path)}
               </Link>
             </li>
           )
         })}
       </ul>
+
     </div>
   )
 }

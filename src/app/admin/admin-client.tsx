@@ -21,14 +21,12 @@ export default function AdminClient() {
     rescanInterval: null,
   });
 
-  // Load existing backends
   useEffect(() => {
     (async () => {
       setBackends(await fetch('/api/backends').then((r) => r.json()));
     })();
   }, []);
 
-  // Create or update a backend
   async function save() {
     const method = form.id ? 'PUT' : 'POST';
     const res = await fetch('/api/backends', {
@@ -38,19 +36,16 @@ export default function AdminClient() {
     });
     const saved: Backend = await res.json();
 
-    // Trigger an immediate scan
     await fetch('/api/backends/scan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: saved.id }),
     });
 
-    // Reload list and reset form
     setBackends(await fetch('/api/backends').then((r) => r.json()));
     setForm({ authEnabled: false, rescanInterval: null });
   }
 
-  // Manually trigger a rescan
   async function rescan(id: number) {
     await fetch('/api/backends/scan', {
       method: 'POST',
@@ -60,7 +55,6 @@ export default function AdminClient() {
     alert('Rescan triggered');
   }
 
-  // Delete a backend and shift IDs
   async function deleteBackend(id: number) {
     if (!confirm(`Delete backend #${id}?`)) return;
     await fetch('/api/backends', {
@@ -71,7 +65,6 @@ export default function AdminClient() {
     setBackends(await fetch('/api/backends').then((r) => r.json()));
   }
 
-  // Populate form for editing
   function edit(b: Backend) {
     setForm({
       id: b.id,
@@ -84,7 +77,6 @@ export default function AdminClient() {
     });
   }
 
-  // Cancel editing and return to add mode
   function cancel() {
     setForm({ authEnabled: false, rescanInterval: null });
   }
