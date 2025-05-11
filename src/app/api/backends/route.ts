@@ -66,63 +66,29 @@ export async function PUT(req: NextRequest) {
   const authErr = await requireAdmin();
   if (authErr) return authErr;
 
-  const { id, name, url, authEnabled, username, password, rescanInterval } = await req.json();
+  const { id, name, url, authEnabled, username, password, rescanInterval } =
+    await req.json();
+  const label = name?.trim() || url;
 
-  const updates: string[] = [];
-  const values: (string | number | null)[] = [];
-
-  if (name) {
-    updates.push('name = ?');
-    values.push(name.trim());
-  }
-
-  if (url) {
-    updates.push('url = ?');
-    values.push(url);
-  }
-
-  if (authEnabled !== undefined) {
-    updates.push('authEnabled = ?');
-    values.push(authEnabled ? 1 : 0);
-  }
-
-  if (username) {
-    updates.push('username = ?');
-    values.push(username);
-  }
-
-  if (password) {
-    updates.push('password = ?');
-    values.push(password);
-  }
-
-  if (rescanInterval !== null && rescanInterval !== undefined) {
-    updates.push('rescanInterval = ?');
-    values.push(rescanInterval);
-  }
-
-  if (updates.length === 0) {
-    return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
-  }
-
-  const updateQuery = `
+  db.prepare(`
     UPDATE backends
-    SET ${updates.join(', ')}
-    WHERE id = ?
-  `;
-
-  const updateValues = [...values, id];
-
-  db.prepare(updateQuery).run(...updateValues);
+       SET name = ?, url = ?, authEnabled = ?, username = ?, password = ?, rescanInterval = ?
+     WHERE id = ?
+  `).run(
+    label,
+    url,
+    authEnabled ? 1 : 0,
+    username || null,
+    password || null,
+    rescanInterval ?? null,
+    id
+  );
 
   const updated = db
     .prepare('SELECT * FROM backends WHERE id = ?')
     .get(id);
-
   return NextResponse.json(updated);
 }
-
-
 
 export async function DELETE(req: NextRequest) {
   const authErr = await requireAdmin();
