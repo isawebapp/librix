@@ -84,3 +84,19 @@ code, pre {
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
 }
+
+.rpv-core__viewer {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.rpv-core__inner {
+  height: 100% !important;
+}
+
+/* (Optional) reset root to avoid unwanted scrollbars */
+html, body, #__next {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}

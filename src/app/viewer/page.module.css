@@ -1,5 +1,3 @@
-/* app/viewer/page.module.css */
-
 .container {
   position: fixed;
   top: 64px;
@@ -8,8 +6,6 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin: 0;
-  padding: 0;
 }
 
 .viewerWrapper {
@@ -19,21 +15,4 @@
   height: 100%;
   overflow: hidden;
   --scale-factor: 1;
-}
-
-:global(.rpv-core__viewer) {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-:global(.rpv-core__inner) {
-  height: 100% !important;
-}
-
-:global(html),
-:global(body),
-:global(#__next) {
-  margin: 0;
-  padding: 0;
-  height: 100%;
 }
