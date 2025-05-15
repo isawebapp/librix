@@ -1,8 +1,8 @@
 // app/viewer/page.tsx
-
 import React from 'react'
 import Image from 'next/image'
 import styles from './page.module.css'
+import PdfViewerClient from './PdfViewerClient'
 
 type ViewerPageProps = {
   searchParams: Promise<{
@@ -40,16 +40,7 @@ export default async function ViewerPage({
 
   let viewerElement: React.ReactNode
   if (ext === 'pdf') {
-    viewerElement = (
-      <iframe
-        src={src}
-        style={{
-          width: '100%',
-          height: '100%',
-          border: 'none',
-        }}
-      />
-    )
+    viewerElement = <PdfViewerClient fileUrl={src} />
   } else if (
     ext &&
     ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)
@@ -60,25 +51,16 @@ export default async function ViewerPage({
         alt={path}
         width={800}
         height={600}
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'contain',
-        }}
+        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
         unoptimized
       />
-
     )
   } else if (ext && ['mp4', 'webm', 'ogg'].includes(ext)) {
     viewerElement = (
       <video
         src={src}
         controls
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'contain',
-        }}
+        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
       />
     )
   } else {
@@ -91,7 +73,9 @@ export default async function ViewerPage({
 
   return (
     <div className={styles.container}>
-      {viewerElement}
+      <div className={styles.viewerWrapper}>
+        {viewerElement}
+      </div>
     </div>
   )
 }

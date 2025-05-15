@@ -11,6 +11,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preload" href="/pdf.worker.min.js" as="script" />
+      </head>
       <body>
         <Suspense fallback={<div>Loading…</div>}>
           <NavBar />
