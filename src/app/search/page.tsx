@@ -29,16 +29,32 @@ export default async function SearchPage({
   const proto = hdrs.get('x-forwarded-proto') ?? (host.includes('localhost') ? 'http' : 'https')
   const origin = `${proto}://${host}`
 
-  const [backends, results] = await Promise.all([
-    fetch(`${origin}/api/backends`, { cache: 'no-store' })
-      .then((r) => r.json()) as Promise<Backend[]>,
-    q
-      ? fetch(
+  let backends: Backend[] = []
+  let results: SearchResult[] = []
+  
+  try {
+    const [backendsRes, resultsRes] = await Promise.all([
+      fetch(`${origin}/api/backends`, { cache: 'no-store' }),
+      q ? fetch(
         `${origin}/api/files/search?q=${encodeURIComponent(q)}`,
         { cache: 'no-store' }
-      ).then((r) => r.json()) as Promise<SearchResult[]>
-      : Promise.resolve([]),
-  ])
+      ) : Promise.resolve(null)
+    ])
+
+    if (backendsRes.ok) {
+      backends = await backendsRes.json() as Backend[]
+    } else {
+      console.error('Failed to fetch backends:', backendsRes.status, backendsRes.statusText)
+    }
+
+    if (resultsRes && resultsRes.ok) {
+      results = await resultsRes.json() as SearchResult[]
+    } else if (resultsRes) {
+      console.error('Failed to search files:', resultsRes.status, resultsRes.statusText)
+    }
+  } catch (error) {
+    console.error('Network error:', error)
+  }
 
   return (
     <div className="mt-14 p-4">
@@ -62,6 +78,12 @@ export default async function SearchPage({
       {q && results.length === 0 && (
         <p className="text-gray-700 dark:text-gray-300">
           No files found for “{q}”.
+        </p>
+      )}
+      
+      {q && results.length === 0 && !backends.length && (
+        <p className="text-red-500 mt-2">
+          Error: Could not fetch backend information
         </p>
       )}
 

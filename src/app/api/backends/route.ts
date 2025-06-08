@@ -27,92 +27,124 @@ function getNextId() {
 }
 
 export async function GET() {
-  const list = db
-    .prepare('SELECT id, name, rescanInterval FROM backends ORDER BY id')
-    .all() as { id: number; name: string; rescanInterval: number | null }[];
-  return NextResponse.json(list);
+  try {
+    const list = db
+      .prepare('SELECT id, name, rescanInterval FROM backends ORDER BY id')
+      .all() as { id: number; name: string; rescanInterval: number | null }[];
+    return NextResponse.json(list);
+  } catch (error) {
+    console.error('Error fetching backends:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch backends' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {
-  const authErr = await requireAdmin();
-  if (authErr) return authErr;
+  try {
+    const authErr = await requireAdmin();
+    if (authErr) return authErr;
 
-  const { name, url, authEnabled, username, password, rescanInterval } =
-    await req.json();
-  const id = getNextId();
-  const label = name?.trim() || url;
+    const { name, url, authEnabled, username, password, rescanInterval } =
+      await req.json();
+    const id = getNextId();
+    const label = name?.trim() || url;
 
-  db.prepare(`
-    INSERT INTO backends
-      (id, name, url, authEnabled, username, password, rescanInterval)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    id,
-    label,
-    url,
-    authEnabled ? 1 : 0,
-    username || null,
-    password || null,
-    rescanInterval ?? null
-  );
+    db.prepare(`
+      INSERT INTO backends
+        (id, name, url, authEnabled, username, password, rescanInterval)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      id,
+      label,
+      url,
+      authEnabled ? 1 : 0,
+      username || null,
+      password || null,
+      rescanInterval ?? null
+    );
 
-  const created = db
-    .prepare('SELECT * FROM backends WHERE id = ?')
-    .get(id);
-  return NextResponse.json(created, { status: 201 });
+    const created = db
+      .prepare('SELECT * FROM backends WHERE id = ?')
+      .get(id);
+    return NextResponse.json(created, { status: 201 });
+  } catch (error) {
+    console.error('Error creating backend:', error);
+    return NextResponse.json(
+      { error: 'Failed to create backend' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function PUT(req: NextRequest) {
-  const authErr = await requireAdmin();
-  if (authErr) return authErr;
+  try {
+    const authErr = await requireAdmin();
+    if (authErr) return authErr;
 
-  const { id, name, url, authEnabled, username, password, rescanInterval } =
-    await req.json();
-  const label = name?.trim() || url;
+    const { id, name, url, authEnabled, username, password, rescanInterval } =
+      await req.json();
+    const label = name?.trim() || url;
 
-  db.prepare(`
-    UPDATE backends
-       SET name = ?, url = ?, authEnabled = ?, username = ?, password = ?, rescanInterval = ?
-     WHERE id = ?
-  `).run(
-    label,
-    url,
-    authEnabled ? 1 : 0,
-    username || null,
-    password || null,
-    rescanInterval ?? null,
-    id
-  );
+    db.prepare(`
+      UPDATE backends
+         SET name = ?, url = ?, authEnabled = ?, username = ?, password = ?, rescanInterval = ?
+       WHERE id = ?
+    `).run(
+      label,
+      url,
+      authEnabled ? 1 : 0,
+      username || null,
+      password || null,
+      rescanInterval ?? null,
+      id
+    );
 
-  const updated = db
-    .prepare('SELECT * FROM backends WHERE id = ?')
-    .get(id);
-  return NextResponse.json(updated);
+    const updated = db
+      .prepare('SELECT * FROM backends WHERE id = ?')
+      .get(id);
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('Error updating backend:', error);
+    return NextResponse.json(
+      { error: 'Failed to update backend' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function DELETE(req: NextRequest) {
-  const authErr = await requireAdmin();
-  if (authErr) return authErr;
+  try {
+    const authErr = await requireAdmin();
+    if (authErr) return authErr;
 
-  const { id } = await req.json();
-  const delId = Number(id);
+    const { id } = await req.json();
+    const delId = Number(id);
 
-  db.prepare('DELETE FROM backends WHERE id = ?').run(delId);
+    db.prepare('DELETE FROM backends WHERE id = ?').run(delId);
 
-  const higher = db
-    .prepare('SELECT id FROM backends WHERE id > ? ORDER BY id ASC')
-    .all() as { id: number }[];
+    const higher = db
+      .prepare('SELECT id FROM backends WHERE id > ? ORDER BY id ASC')
+      .all() as { id: number }[];
 
-  const shift = db.transaction((rows: { id: number }[]) => {
-    for (const { id: oldId } of rows) {
-      const newId = oldId - 1;
-      db.prepare('UPDATE files SET backendId = ? WHERE backendId = ?')
-        .run(newId, oldId);
-      db.prepare('UPDATE backends SET id = ? WHERE id = ?')
-        .run(newId, oldId);
-    }
-  });
-  shift(higher);
+    const shift = db.transaction((rows: { id: number }[]) => {
+      for (const { id: oldId } of rows) {
+        const newId = oldId - 1;
+        db.prepare('UPDATE files SET backendId = ? WHERE backendId = ?')
+          .run(newId, oldId);
+        db.prepare('UPDATE backends SET id = ? WHERE id = ?')
+          .run(newId, oldId);
+      }
+    });
+    shift(higher);
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting backend:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete backend' },
+      { status: 500 }
+    );
+  }
 }
