@@ -3,6 +3,9 @@
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import PdfViewerClient from './PdfViewerClient';
+import TextViewerClient from './TextViewerClient';
+import AudioViewerClient from './AudioViewerClient';
+import MarkdownViewerClient from './MarkdownViewerClient';
 
 export default function ViewerPage() {
   const searchParams = useSearchParams();
@@ -14,16 +17,15 @@ export default function ViewerPage() {
   const ext = path.split('.').pop()?.toLowerCase();
 
   let viewerElement: React.ReactNode;
+  const fileName = path.split('/').pop() || '';
+  
   if (ext === 'pdf') {
     viewerElement = <PdfViewerClient fileUrl={src} />;
-  } else if (
-    ext &&
-    ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)
-  ) {
+  } else if (ext && ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
     viewerElement = (
       <Image
         src={src}
-        alt={path}
+        alt={fileName}
         width={800}
         height={600}
         className="w-full h-full object-contain"
@@ -38,16 +40,24 @@ export default function ViewerPage() {
         className="w-full h-full object-contain"
       />
     );
+  } else if (ext && ['txt', 'js', 'ts', 'html', 'css', 'json', 'xml', 'yaml', 'csv'].includes(ext)) {
+    viewerElement = <TextViewerClient fileUrl={src} fileName={fileName} />;
+  } else if (ext && ['mp3', 'wav'].includes(ext)) {
+    viewerElement = <AudioViewerClient fileUrl={src} fileName={fileName} />;
+  } else if (ext && ['md', 'markdown'].includes(ext)) {
+    viewerElement = <MarkdownViewerClient fileUrl={src} fileName={fileName} />;
   } else {
     viewerElement = (
-      <a
-        href={src}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-primary-500 underline"
-      >
-        Download {path.split('/').pop()}
-      </a>
+      <div className="flex flex-col items-center justify-center h-full">
+        <p className="mb-4">Preview not available for this file type</p>
+        <a
+          href={src}
+          download={fileName}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Download {fileName}
+        </a>
+      </div>
     );
   }
 
