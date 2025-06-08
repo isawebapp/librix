@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import styles from './page.module.css';
 
 type Entry = {
   id: number;
@@ -32,13 +31,10 @@ export default function ExplorerClient() {
   useEffect(() => {
     if (backendId != null) {
       setEntries([]);
-
       fetch(`/api/files/explorer?backendId=${backendId}&path=${encodeURIComponent(pathParam)}`)
-        .then((r) => r.json())
-        .then((data) => {
-          if (data && Array.isArray(data)) {
-            setEntries(data);
-          }
+        .then(r => r.json())
+        .then(data => {
+          if (Array.isArray(data)) setEntries(data);
         });
     }
   }, [backendId, pathParam]);
@@ -67,15 +63,15 @@ export default function ExplorerClient() {
   };
 
   return (
-    <div className={styles.container}>
-      <aside className={styles.sidebar}>
-        <h2>Backends</h2>
-        <ul>
+    <div className="flex mt-14 h-screen">
+      <aside className="w-56 border-r border-gray-200 dark:border-gray-700 overflow-y-auto p-4">
+        <h2 className="text-lg font-semibold mb-4">Backends</h2>
+        <ul className="space-y-2">
           {backends.map(b => (
             <li key={b.id}>
               <button
                 onClick={() => updateUrl(b.id, '/')}
-                className={b.id === backendId ? styles.active : undefined}
+                className={`${b.id === backendId ? 'bg-gray-200 dark:bg-gray-700' : ''} w-full text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-600`}
               >
                 {b.id}: {b.name}
               </button>
@@ -84,42 +80,55 @@ export default function ExplorerClient() {
         </ul>
       </aside>
 
-      <section className={styles.main}>
-        <h1>Explorer</h1>
+      <section className="flex-1 p-4 overflow-y-auto">
+        <h1 className="text-2xl font-semibold mb-4">Explorer</h1>
 
         {backendId != null ? (
           <>
-            <div className={styles.pathBar}>
+            <div className="flex space-x-2 mb-4">
               <input
+                className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded"
                 placeholder="Enter folder..."
                 value={pathInput}
                 onChange={e => setPathInput(e.target.value)}
               />
-              <button onClick={onGo}>Go</button>
+              <button
+                onClick={onGo}
+                className="ml-2 px-4 py-2 bg-primary-500 text-white rounded hover:bg-primary-600"
+              >
+                Go
+              </button>
             </div>
 
-            <div className={styles.upBar}>
-              <button onClick={goUp} disabled={pathParam === '/'}> ↑ Up </button>
-              <span className={styles.cwd}>{decodeURIComponent(pathParam)}</span>
+            <div className="flex items-center space-x-2 mb-4">
+              <button
+                onClick={goUp}
+                disabled={pathParam === '/'}
+                className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
+              >
+                ↑ Up
+              </button>
+              <span className="ml-2 font-mono">{decodeURIComponent(pathParam)}</span>
             </div>
 
-
-            <ul className={styles.entries}>
-              {entries.map((e) => (
-                <li key={e.id}>
-                  {e.isDirectory ? '📁' : '📄'}{' '}
+            <ul className="space-y-2">
+              {entries.map(e => (
+                <li key={e.id} className="flex items-center space-x-2">
+                  <span>{e.isDirectory ? '📁' : '📄'}</span>
                   {e.isDirectory ? (
                     <button
                       onClick={() => {
                         const dir = e.path.endsWith('/') ? e.path : e.path + '/';
                         updateUrl(backendId, dir);
                       }}
+                      className="text-primary-500 hover:underline"
                     >
                       {decodeURIComponent(e.name)}
                     </button>
                   ) : (
                     <Link
                       href={`/viewer?backendId=${backendId}&path=${encodeURIComponent(e.path)}`}
+                      className="text-primary-500 hover:underline"
                     >
                       {decodeURIComponent(e.name)}
                     </Link>
@@ -127,10 +136,9 @@ export default function ExplorerClient() {
                 </li>
               ))}
             </ul>
-
           </>
         ) : (
-          <p>Please select a backend from above.</p>
+          <p className="text-gray-600 dark:text-gray-400">Please select a backend from above.</p>
         )}
       </section>
     </div>

@@ -3,7 +3,6 @@
 import React from 'react'
 import Link from 'next/link'
 import { headers } from 'next/headers'
-import styles from './page.module.css'
 
 type SearchResult = {
   id: number
@@ -42,34 +41,42 @@ export default async function SearchPage({
   ])
 
   return (
-    <div className={styles.container}>
-      <h1>Search Files</h1>
+    <div className="mt-14 p-4">
+      <h1 className="text-2xl font-semibold mb-6">Search Files</h1>
 
-      <form method="get" style={{ marginBottom: '1em' }}>
+      <form method="get" className="mb-6 flex">
         <input
           name="q"
           defaultValue={q}
           placeholder="filename…"
-          style={{ marginRight: '0.5ch' }}
+          className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-l"
         />
-        <button type="submit">Search</button>
+        <button
+          type="submit"
+          className="px-4 bg-primary-500 text-white rounded-r hover:bg-primary-600"
+        >
+          Search
+        </button>
       </form>
 
-      {q && results.length === 0 && <p>No files found for “{q}”.</p>}
+      {q && results.length === 0 && (
+        <p className="text-gray-700 dark:text-gray-300">
+          No files found for “{q}”.
+        </p>
+      )}
 
-      <ul>
+      <ul className="space-y-2">
         {results.map((r) => {
           const be = backends.find((b) => b.id === r.backendId)
           const label = be ? `${be.id} – ${be.name}` : `${r.backendId}`
 
           return (
-            <li key={r.id}>
-              {r.isDirectory ? '📁' : '📄'}{' '}
-              <span style={{ fontStyle: 'italic', marginRight: '0.5ch' }}>
-                [{label}]
-              </span>
+            <li key={r.id} className="flex items-center space-x-2">
+              <span>{r.isDirectory ? '📁' : '📄'}</span>
+              <span className="italic text-gray-500">[{label}]</span>
               <Link
                 href={`/viewer?backendId=${r.backendId}&path=${encodeURIComponent(r.path)}`}
+                className="text-primary-500 hover:underline break-all"
               >
                 {decodeURIComponent(r.path)}
               </Link>
@@ -77,7 +84,6 @@ export default async function SearchPage({
           )
         })}
       </ul>
-
     </div>
   )
 }

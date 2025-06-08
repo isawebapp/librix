@@ -1,4 +1,3 @@
-// src/app/admin/admin-client.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -82,33 +81,32 @@ export default function AdminClient() {
   }
 
   return (
-    <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Admin Panel</h1>
-        <button onClick={() => signOut({ callbackUrl: '/' })} style={{ padding: '0.5rem 1rem' }}>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Admin Panel</h1>
+        <button
+          onClick={() => signOut({ callbackUrl: '/' })}
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        >
           Logout
         </button>
       </div>
 
-      <ul style={{ listStyle: 'none', padding: 0 }}>
+      <ul className="list-none p-0 space-y-2">
         {backends.map((b) => (
-          <li key={b.id} style={{ marginBottom: '0.5rem' }}>
-            <span
-              style={{
-                display: 'inline-block',
-                width: '2ch',
-                fontWeight: 'bold',
-                textAlign: 'right',
-                marginRight: '0.5rem',
-              }}
-            >
-              {b.id}
-            </span>
-            <strong>{b.name}</strong>{' '}
-            <button onClick={() => edit(b)}>Edit</button>{' '}
-            <button onClick={() => rescan(b.id)}>Rescan</button>{' '}
-            <button onClick={() => deleteBackend(b.id)}>Delete</button>{' '}
-            <em>
+          <li key={b.id} className="flex items-center">
+            <span className="inline-block w-8 font-bold text-right mr-2">{b.id}</span>
+            <strong className="mr-4">{b.name}</strong>
+            <button onClick={() => edit(b)} className="text-primary-500 hover:underline mr-2">
+              Edit
+            </button>
+            <button onClick={() => rescan(b.id)} className="text-primary-500 hover:underline mr-2">
+              Rescan
+            </button>
+            <button onClick={() => deleteBackend(b.id)} className="text-red-500 hover:underline mr-2">
+              Delete
+            </button>
+            <em className="text-sm text-gray-600 dark:text-gray-400">
               Auto-rescan:{' '}
               {b.rescanInterval == null
                 ? 'never'
@@ -118,88 +116,113 @@ export default function AdminClient() {
         ))}
       </ul>
 
-      <h2>{form.id ? 'Edit' : 'Add'} Backend</h2>
-      <div style={{ marginBottom: '1rem' }}>
-        <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-          Name:{' '}
-          <input
-            value={form.name || ''}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-        </label>
-
-        <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-          URL:{' '}
-          <input
-            value={form.url || ''}
-            onChange={(e) => setForm({ ...form, url: e.target.value })}
-          />
-        </label>
-
-        <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-          Auth?{' '}
-          <input
-            type="checkbox"
-            checked={form.authEnabled || false}
-            onChange={(e) => setForm({ ...form, authEnabled: e.target.checked })}
-          />
-        </label>
-
-        {form.authEnabled && (
-          <>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Username:{' '}
-              <input
-                value={form.username || ''}
-                onChange={(e) => setForm({ ...form, username: e.target.value })}
-              />
-            </label>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Password:{' '}
-              <input
-                type="password"
-                value={form.password || ''}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-              />
-            </label>
-          </>
-        )}
-
-        <fieldset style={{ marginBottom: '0.5rem' }}>
-          <legend>Auto-rescan</legend>
-          <label style={{ marginRight: '1rem' }}>
+      <div>
+        <h2 className="text-xl font-semibold mb-2">{form.id ? 'Edit' : 'Add'} Backend</h2>
+        <div className="space-y-4">
+          <label className="block">
+            <span className="block mb-1">Name:</span>
             <input
-              type="radio"
-              name="rescanOption"
-              checked={form.rescanInterval == null}
-              onChange={() => setForm({ ...form, rescanInterval: null })}
-            />{' '}
-            Never
+              value={form.name || ''}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded"
+            />
           </label>
-          <label>
-            <input
-              type="radio"
-              name="rescanOption"
-              checked={form.rescanInterval != null}
-              onChange={() => setForm({ ...form, rescanInterval: form.rescanInterval ?? 5 })}
-            />{' '}
-            Every{' '}
-            <input
-              type="number"
-              disabled={form.rescanInterval == null}
-              value={form.rescanInterval ?? ''}
-              onChange={(e) => setForm({ ...form, rescanInterval: Number(e.target.value) })}
-              style={{ width: '4ch', marginLeft: '0.25rem' }}
-            />{' '}
-            minutes
-          </label>
-        </fieldset>
 
-        <button onClick={save} style={{ marginRight: '0.5rem' }}>
-          {form.id ? 'Update' : 'Add'} Backend
-        </button>
-        {form.id && <button onClick={cancel}>Cancel</button>}
+          <label className="block">
+            <span className="block mb-1">URL:</span>
+            <input
+              value={form.url || ''}
+              onChange={(e) => setForm({ ...form, url: e.target.value })}
+              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded"
+            />
+          </label>
+
+          <label className="block">
+            <input
+              type="checkbox"
+              checked={form.authEnabled || false}
+              onChange={(e) => setForm({ ...form, authEnabled: e.target.checked })}
+              className="mr-2"
+            />
+            Auth?
+          </label>
+
+          {form.authEnabled && (
+            <>
+              <label className="block">
+                <span className="block mb-1">Username:</span>
+                <input
+                  value={form.username || ''}
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded"
+                />
+              </label>
+              <label className="block">
+                <span className="block mb-1">Password:</span>
+                <input
+                  type="password"
+                  value={form.password || ''}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded"
+                />
+              </label>
+            </>
+          )}
+
+          <fieldset className="mb-4">
+            <legend className="font-medium">Auto-rescan</legend>
+            <div className="flex items-center">
+              <label className="mr-4 flex items-center">
+                <input
+                  type="radio"
+                  name="rescanOption"
+                  checked={form.rescanInterval == null}
+                  onChange={() => setForm({ ...form, rescanInterval: null })}
+                  className="mr-2"
+                />
+                Never
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="rescanOption"
+                  checked={form.rescanInterval != null}
+                  onChange={() => setForm({ ...form, rescanInterval: form.rescanInterval ?? 5 })}
+                  className="mr-2"
+                />
+                Every
+                <input
+                  type="number"
+                  disabled={form.rescanInterval == null}
+                  value={form.rescanInterval ?? ''}
+                  onChange={(e) =>
+                    setForm({ ...form, rescanInterval: Number(e.target.value) })
+                  }
+                  className="w-16 ml-2 p-1 border border-gray-300 dark:border-gray-600 rounded"
+                />
+                <span className="ml-1">minutes</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div className="flex space-x-4">
+            <button
+              onClick={save}
+              className="px-4 py-2 bg-primary-500 text-white rounded hover:bg-primary-600"
+            >
+              {form.id ? 'Update' : 'Add'} Backend
+            </button>
+            {form.id && (
+              <button
+                onClick={cancel}
+                className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

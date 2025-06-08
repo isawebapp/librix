@@ -1,14 +1,12 @@
 /* src/app/globals.css */
+@import "tailwindcss";
 
-/* CSS Variables for easy theming */
+@layer theme, base, components, utilities;
+
+/* CSS Variables for easy theming (unused by Tailwind but retained if needed) */
 :root {
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont,
     'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --color-bg: #f9fafb;
-  --color-text: #111827;
-  --color-link: #3b82f6;
-  --color-border: #e5e7eb;
-  --spacing: 1rem;
 }
 
 /* Box sizing and resets */
@@ -23,15 +21,6 @@ html, body {
   height: 100%;
 }
 
-/* Base typography */
-html {
-  font-family: var(--font-sans);
-  line-height: 1.5;
-  font-size: 100%; /* 16px */
-  background-color: var(--color-bg);
-  color: var(--color-text);
-}
-
 /* Remove default list styles */
 ul {
   list-style: none;
@@ -39,59 +28,10 @@ ul {
   padding: 0;
 }
 
-/* Links */
-a {
-  color: var(--color-link);
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
-}
-
-/* Form elements inherit font */
-input, button, select, textarea {
-  font: inherit;
-  margin: 0;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-}
-button {
-  cursor: pointer;
-}
-
 /* Media elements responsive */
 img, video, iframe {
   max-width: 100%;
   height: auto;
-}
-
-/* Headings spacing */
-h1, h2, h3, h4, h5, h6 {
-  margin: var(--spacing) 0 0.5rem;
-  font-weight: 600;
-}
-
-/* Paragraphs */
-p {
-  margin: 0 0 var(--spacing);
-}
-
-/* Code blocks */
-code, pre {
-  font-family: 'Source Code Pro', monospace;
-  background-color: #e5e7eb;
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-}
-
-.rpv-core__viewer {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-.rpv-core__inner {
-  height: 100% !important;
 }
 
 /* (Optional) reset root to avoid unwanted scrollbars */
