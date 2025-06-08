@@ -1,60 +1,59 @@
 // app/search/page.tsx
 
-import React from 'react'
-import Link from 'next/link'
-import { headers } from 'next/headers'
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 type SearchResult = {
-  id: number
-  backendId: number
-  path: string
-  isDirectory: boolean
-}
+  id: number;
+  backendId: number;
+  path: string;
+  isDirectory: boolean;
+};
 
 type Backend = {
-  id: number
-  name: string
-}
+  id: number;
+  name: string;
+};
 
-export default async function SearchPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string | string[] }>
-}) {
-  const params = await searchParams
-  const rawQ = params.q
-  const q = Array.isArray(rawQ) ? rawQ[0] : rawQ ?? ''
-  const hdrs = await headers()
-  const host = hdrs.get('x-forwarded-host') ?? hdrs.get('host')!
-  const proto = hdrs.get('x-forwarded-proto') ?? (host.includes('localhost') ? 'http' : 'https')
-  const origin = `${proto}://${host}`
+export default function SearchPage() {
+  const searchParams = useSearchParams();
+  const q = searchParams.get('q') || '';
+  const [backends, setBackends] = useState<Backend[]>([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  let backends: Backend[] = []
-  let results: SearchResult[] = []
-  
-  try {
-    const [backendsRes, resultsRes] = await Promise.all([
-      fetch(`${origin}/api/backends`, { cache: 'no-store' }),
-      q ? fetch(
-        `${origin}/api/files/search?q=${encodeURIComponent(q)}`,
-        { cache: 'no-store' }
-      ) : Promise.resolve(null)
-    ])
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [backendsRes, resultsRes] = await Promise.all([
+          fetch('/api/backends', { cache: 'no-store' }),
+          q ? fetch(`/api/files/search?q=${encodeURIComponent(q)}`, { cache: 'no-store' }) : null
+        ]);
 
-    if (backendsRes.ok) {
-      backends = await backendsRes.json() as Backend[]
-    } else {
-      console.error('Failed to fetch backends:', backendsRes.status, backendsRes.statusText)
-    }
+        if (backendsRes.ok) {
+          setBackends(await backendsRes.json());
+        } else {
+          console.error('Failed to fetch backends:', backendsRes.status, backendsRes.statusText);
+        }
 
-    if (resultsRes && resultsRes.ok) {
-      results = await resultsRes.json() as SearchResult[]
-    } else if (resultsRes) {
-      console.error('Failed to search files:', resultsRes.status, resultsRes.statusText)
-    }
-  } catch (error) {
-    console.error('Network error:', error)
-  }
+        if (resultsRes && resultsRes.ok) {
+          setResults(await resultsRes.json());
+        } else if (resultsRes) {
+          console.error('Failed to search files:', resultsRes.status, resultsRes.statusText);
+        }
+      } catch (error) {
+        console.error('Network error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [q]);
 
   return (
     <div className="mt-14 p-4">
@@ -75,13 +74,15 @@ export default async function SearchPage({
         </button>
       </form>
 
-      {q && results.length === 0 && (
+      {loading && <p>Loading...</p>}
+
+      {!loading && q && results.length === 0 && (
         <p className="text-gray-700 dark:text-gray-300">
           No files found for “{q}”.
         </p>
       )}
       
-      {q && results.length === 0 && !backends.length && (
+      {!loading && q && results.length === 0 && backends.length === 0 && (
         <p className="text-red-500 mt-2">
           Error: Could not fetch backend information
         </p>
@@ -89,8 +90,8 @@ export default async function SearchPage({
 
       <ul className="space-y-2">
         {results.map((r) => {
-          const be = backends.find((b) => b.id === r.backendId)
-          const label = be ? `${be.id} – ${be.name}` : `${r.backendId}`
+          const be = backends.find((b) => b.id === r.backendId);
+          const label = be ? `${be.id} – ${be.name}` : `${r.backendId}`;
 
           return (
             <li key={r.id} className="flex items-center space-x-2">
@@ -103,9 +104,9 @@ export default async function SearchPage({
                 {decodeURIComponent(r.path)}
               </Link>
             </li>
-          )
+          );
         })}
       </ul>
     </div>
-  )
+  );
 }

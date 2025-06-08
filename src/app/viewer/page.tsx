@@ -1,40 +1,16 @@
-// app/viewer/page.tsx
-import React from 'react';
+'use client';
+
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import PdfViewerClient from './PdfViewerClient';
 
-type ViewerPageProps = {
-  searchParams: Promise<{
-    backendId?: string | string[];
-    path?: string | string[];
-  }>;
-};
-
-export default async function ViewerPage({
-  searchParams,
-}: ViewerPageProps) {
-  const params = await searchParams;
-
-  const rawBackend = params.backendId;
-  const backendId =
-    typeof rawBackend === 'string'
-      ? rawBackend
-      : Array.isArray(rawBackend)
-      ? rawBackend[0]
-      : '';
-
-  const rawPath = params.path;
-  const path =
-    typeof rawPath === 'string'
-      ? rawPath
-      : Array.isArray(rawPath)
-      ? rawPath[0]
-      : '';
-
-  const src = `/api/files/view?backendId=${encodeURIComponent(
-    backendId
-  )}&path=${encodeURIComponent(path)}`;
-
+export default function ViewerPage() {
+  const searchParams = useSearchParams();
+  
+  const backendId = searchParams.get('backendId') || '';
+  const path = searchParams.get('path') || '';
+  
+  const src = `/api/files/view?backendId=${encodeURIComponent(backendId)}&path=${encodeURIComponent(path)}`;
   const ext = path.split('.').pop()?.toLowerCase();
 
   let viewerElement: React.ReactNode;
