@@ -15,6 +15,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className="bg-gray-100 dark:bg-gray-900"
       style={{ colorScheme: 'light dark' }}
     >
