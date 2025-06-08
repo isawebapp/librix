@@ -8,6 +8,12 @@ import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout'
 import '@react-pdf-viewer/core/lib/styles/index.css'
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 
+// Disable Node.js features for browser environment
+if (typeof window !== 'undefined') {
+    window.PDFJS = window.PDFJS || {};
+    window.PDFJS.disableNodeJS = true;
+}
+
 type Props = {
     fileUrl: string
 }

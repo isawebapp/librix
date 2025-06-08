@@ -58,3 +58,12 @@ declare module 'node-cron' {
 }
 
 declare module 'better-sqlite3';
+
+// Extend Window interface for PDF.js
+declare global {
+  interface Window {
+    PDFJS?: {
+      disableNodeJS?: boolean;
+    };
+  }
+}
