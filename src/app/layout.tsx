@@ -22,7 +22,7 @@ export default function RootLayout({
       <head>
         <link rel="preload" href="/pdf.worker.min.js" as="script" />
       </head>
-      <body className="min-h-screen text-gray-900 dark:text-gray-100">
+      <body className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Suspense fallback={<div>Loading…</div>}>
             <NavBar />
