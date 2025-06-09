@@ -57,7 +57,7 @@ export default function ViewerPage() {
   }
 
   return (
-    <div className="mt-14 flex flex-col h-screen">
+<div className="mt-16 md:mt-14 flex flex-col h-screen">
       <div className="flex-1 relative overflow-hidden bg-white dark:bg-gray-800">
         {viewerElement}
       </div>

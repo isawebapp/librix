@@ -27,7 +27,7 @@ export default function RootLayout({
           <Suspense fallback={<div>Loading…</div>}>
             <NavBar />
           </Suspense>
-          <main className="p-4">{children}</main>
+          <main className="pt-16 md:pt-0 p-4">{children}</main>
         </ThemeProvider>
       </body>
     </html>
