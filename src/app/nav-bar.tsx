@@ -21,11 +21,11 @@ export default function NavBar() {
     setMounted(true);
   }, []);
 
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-
   const toggleTheme = () => {
     if (!mounted) return;
-    setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    // Dynamically determine current theme to avoid stale closure
+    const effectiveTheme = theme === 'system' ? systemTheme : theme;
+    setTheme(effectiveTheme === 'dark' ? 'light' : 'dark');
   };
 
   return (
@@ -60,7 +60,7 @@ export default function NavBar() {
         className="ml-auto text-gray-700 dark:text-gray-300 hover:text-primary-500"
         aria-label="Toggle Dark Mode"
       >
-        {mounted && currentTheme === 'dark' ? (
+        {mounted && (theme === 'system' ? systemTheme : theme) === 'dark' ? (
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
                viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

@@ -2,19 +2,39 @@
 
 import { useState, useEffect } from 'react';
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { atomOneDark } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
+import type { SyntaxHighlighterProps } from 'react-syntax-highlighter';
 
 interface TextViewerProps {
   fileUrl: string;
   fileName: string;
 }
 
+type ThemeStyle = SyntaxHighlighterProps['style'];
+
 export default function TextViewerClient({ fileUrl, fileName }: TextViewerProps) {
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [themeStyle, setThemeStyle] = useState<ThemeStyle | null>(null);
 
   useEffect(() => {
+    // Dynamically import the theme
+    const loadTheme = async () => {
+      try {
+        const module = await import('react-syntax-highlighter/dist/cjs/styles/hljs');
+        setThemeStyle(module.atomOneDark);
+      } catch (e) {
+        console.error('Failed to load syntax highlighter theme:', e);
+        setThemeStyle({});
+      }
+    };
+
+    loadTheme();
+  }, []);
+
+  useEffect(() => {
+    if (!themeStyle) return; // Wait until theme is loaded
+
     const fetchContent = async () => {
       try {
         const response = await fetch(fileUrl);
@@ -31,7 +51,7 @@ export default function TextViewerClient({ fileUrl, fileName }: TextViewerProps)
     };
 
     fetchContent();
-  }, [fileUrl]);
+  }, [fileUrl, themeStyle]);
 
   if (loading) {
     return (
@@ -74,14 +94,20 @@ export default function TextViewerClient({ fileUrl, fileName }: TextViewerProps)
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-auto">
-        <SyntaxHighlighter 
-          language={language} 
-          style={atomOneDark}
-          showLineNumbers
-          customStyle={{ margin: 0, borderRadius: 0 }}
-        >
-          {content}
-        </SyntaxHighlighter>
+        {themeStyle ? (
+          <SyntaxHighlighter 
+            language={language} 
+            style={themeStyle}
+            showLineNumbers
+            customStyle={{ margin: 0, borderRadius: 0 }}
+          >
+            {content}
+          </SyntaxHighlighter>
+        ) : (
+          <pre className="bg-gray-100 dark:bg-gray-800 p-4 overflow-auto">
+            {content}
+          </pre>
+        )}
       </div>
       <div className="p-4 bg-gray-100 dark:bg-gray-700 flex justify-end">
         <a
