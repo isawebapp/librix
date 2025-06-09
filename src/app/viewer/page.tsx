@@ -6,6 +6,7 @@ import PdfViewerClient from './PdfViewerClient';
 import TextViewerClient from './TextViewerClient';
 import AudioViewerClient from './AudioViewerClient';
 import MarkdownViewerClient from './MarkdownViewerClient';
+import VideoViewerClient from './VideoViewerClient';
 
 export default function ViewerPage() {
   const searchParams = useSearchParams();
@@ -33,13 +34,7 @@ export default function ViewerPage() {
       />
     );
   } else if (ext && ['mp4', 'webm', 'ogg'].includes(ext)) {
-    viewerElement = (
-      <video
-        src={src}
-        controls
-        className="w-full h-full object-contain"
-      />
-    );
+    viewerElement = <VideoViewerClient fileUrl={src} fileName={fileName} />;
   } else if (ext && ['txt', 'js', 'ts', 'html', 'css', 'json', 'xml', 'yaml', 'csv'].includes(ext)) {
     viewerElement = <TextViewerClient fileUrl={src} fileName={fileName} />;
   } else if (ext && ['mp3', 'wav'].includes(ext)) {
