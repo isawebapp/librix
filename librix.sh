@@ -85,9 +85,7 @@ install_librix() {
 
   # 6. Env vars
   echo "🔧 Configuring environment variables..."
-  read -p "🔑 Cloudflare Turnstile site key: " SITE_KEY
-  read -p "🔑 Cloudflare Turnstile secret key: " SECRET_KEY
-  read -p "🌐 Allowed domains (comma-separated, e.g. localhost:3000,example.com): " DOMAINS
+  read -p "🌐 Domain Hosted: " URL
   read -p "👤 Admin username: " ADMIN_USER
   read -s -p "🔒 Admin password: " ADMIN_PASS
   echo ""
@@ -102,15 +100,11 @@ install_librix() {
   APP_PORT=${APP_PORT:-3000}
 
   cat > .env.local <<EOF
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=$SITE_KEY
-TURNSTILE_SECRET_KEY=$SECRET_KEY
+ADMIN_USER=$ADMIN_USER
+ADMIN_PASS=$ADMIN_PASS
+NEXTAUTH_URL=$URL
+NEXTAUTH_SECRET=$SESSION_PASS
 
-ADMIN_USERNAME=$ADMIN_USER
-ADMIN_PASSWORD=$ADMIN_PASS
-
-SESSION_PASSWORD=$SESSION_PASS
-
-DOMAINS=$DOMAINS
 PORT=$APP_PORT
 EOF
 
