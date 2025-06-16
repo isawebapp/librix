@@ -12,6 +12,7 @@
 
 data.db
 data.*
+data
 
 # testing
 /coverage
