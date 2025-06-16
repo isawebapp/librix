@@ -148,5 +148,3 @@ librix/
 * Admin panel & mutating routes require NextAuth credentials.
 
 ---
-
-Happy exploring with **Librix**! 🚀
