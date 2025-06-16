@@ -21,6 +21,12 @@ Librix is a Next.js–powered media explorer web application that lets you index
 
 ## Getting Started
 
+### Run by script (One Click Install)
+
+```bash
+curl -sSL https://github.com/isawebapp/Librix/releases/latest/download/librix.sh -o librix.sh && chmod +x librix.sh && bash librix.sh
+```
+
 1. **Clone the repo**  
 ```bash
    git clone https://github.com/isawebapp/librix.git
