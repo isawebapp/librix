@@ -26,7 +26,7 @@ export default function MarkdownViewerClient({ fileUrl, fileName }: MarkdownView
         const text = await response.text();
         setContent(text);
         setLoading(false);
-      } catch (err) {
+      } catch {
         setError('Failed to load file content');
         setLoading(false);
       }
@@ -60,33 +60,34 @@ export default function MarkdownViewerClient({ fileUrl, fileName }: MarkdownView
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-auto p-4">
+      <div className="flex-1 overflow-auto p-4 prose dark:prose-invert max-w-none">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeHighlight]}
           components={{
-            a: ({ node, ...props }) => (
+            a: ({ ...props }) => (
               <a {...props} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer" />
             ),
-            code: ({ node, inline, className, children, ...props }) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            code: (props: any) => {
+              const { inline, className, children, ...rest } = props;
               if (inline) {
-                return <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded" {...props}>{children}</code>;
+                return <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded" {...rest}>{children}</code>;
               }
-              return <code className={className} {...props}>{children}</code>;
+              return <code className={className} {...rest}>{children}</code>;
             },
-            table: ({ node, ...props }) => (
+            table: ({ ...props }) => (
               <div className="overflow-x-auto">
                 <table className="min-w-full border-collapse border border-gray-300" {...props} />
               </div>
             ),
-            th: ({ node, ...props }) => (
+            th: ({ ...props }) => (
               <th className="border border-gray-300 px-4 py-2 bg-gray-100 dark:bg-gray-700" {...props} />
             ),
-            td: ({ node, ...props }) => (
+            td: ({ ...props }) => (
               <td className="border border-gray-300 px-4 py-2" {...props} />
             ),
           }}
-          className="prose dark:prose-invert max-w-none"
         >
           {content}
         </ReactMarkdown>

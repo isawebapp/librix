@@ -21,10 +21,10 @@ export default function TextViewerClient({ fileUrl, fileName }: TextViewerProps)
     // Dynamically import the theme
     const loadTheme = async () => {
       try {
-        const module = await import('react-syntax-highlighter/dist/cjs/styles/hljs');
-        setThemeStyle(module.atomOneDark);
-      } catch (e) {
-        console.error('Failed to load syntax highlighter theme:', e);
+        const themeModule = await import('react-syntax-highlighter/dist/cjs/styles/hljs');
+        setThemeStyle(themeModule.atomOneDark);
+      } catch (_e) {
+        console.error('Failed to load syntax highlighter theme:', _e);
         setThemeStyle({});
       }
     };
@@ -44,10 +44,10 @@ export default function TextViewerClient({ fileUrl, fileName }: TextViewerProps)
         const text = await response.text();
         setContent(text);
         setLoading(false);
-      } catch (err) {
-        setError('Failed to load file content');
-        setLoading(false);
-      }
+        } catch {
+          setError('Failed to load file content');
+          setLoading(false);
+        }
     };
 
     fetchContent();
