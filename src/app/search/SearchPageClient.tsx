@@ -69,7 +69,9 @@ export default function SearchPageClient() {
       </form>
       {loading && <p>Loading...</p>}
       {!loading && q && results.length === 0 && (
-        <p className="text-gray-700 dark:text-gray-300">No files found for "{q}".</p>
+        <p className="text-gray-700 dark:text-gray-300">
+          {`No files found for "${q}".`}
+        </p>
       )}
       <ul className="space-y-2">
         {results.map((r) => {
