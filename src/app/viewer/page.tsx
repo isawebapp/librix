@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import PdfViewerClient from './PdfViewerClient';
@@ -8,7 +9,7 @@ import AudioViewerClient from './AudioViewerClient';
 import MarkdownViewerClient from './MarkdownViewerClient';
 import VideoViewerClient from './VideoViewerClient';
 
-export default function ViewerPage() {
+function ViewerContent() {
   const searchParams = useSearchParams();
   
   const backendId = searchParams.get('backendId') || '';
@@ -57,10 +58,18 @@ export default function ViewerPage() {
   }
 
   return (
-<div className="mt-16 md:mt-14 flex flex-col h-screen">
-      <div className="flex-1 relative overflow-hidden bg-white dark:bg-gray-800">
-        {viewerElement}
-      </div>
+    <div className="flex-1 relative overflow-hidden bg-white dark:bg-gray-800">
+      {viewerElement}
+    </div>
+  );
+}
+
+export default function ViewerPage() {
+  return (
+    <div className="mt-16 md:mt-14 flex flex-col h-screen">
+      <Suspense fallback={<div className="flex items-center justify-center h-full">Loading file preview...</div>}>
+        <ViewerContent />
+      </Suspense>
     </div>
   );
 }
